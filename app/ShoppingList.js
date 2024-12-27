@@ -86,7 +86,7 @@ const ShoppingList = () => {
         onChangeText={setSearchQuery}
         style={styles.searchInput}
       />
-      <Button title="Add Item" onPress={() => setModalVisible(true)} />
+      <Button title="Add Item" onPress={() => setModalVisible(true)} color="#444" />
       <Modal
         animationType="slide"
         transparent={true}
@@ -108,11 +108,14 @@ const ShoppingList = () => {
               keyboardType="numeric"
               style={styles.input}
             />
-            <Button
-              title={itemId ? "Update" : "Add"}
-              onPress={itemId ? handleUpdateItem : handleAddItem}
-            />
-            <Button title="Cancel" onPress={resetModal} />
+            <View style={styles.buttonContainer}>
+              <Button
+                title={itemId ? "Update" : "Add"}
+                onPress={itemId ? handleUpdateItem : handleAddItem}
+                color="#000"
+              />
+              <Button title="Cancel" onPress={resetModal} color="#000" />
+            </View>
           </View>
         </View>
       </Modal>
@@ -128,15 +131,16 @@ const ShoppingList = () => {
             <Text
               style={{
                 textDecorationLine: item.purchased ? "line-through" : "none",
-                flex: 1, // Allow text to take available space
+                flex: 1,
+                color: item.purchased ? "#aaa" : "#fff",
               }}
             >
               {item.name} ({item.quantity})
             </Text>
-            <Pressable onPress={() => handleEditItem(item)}>
-              <Icon name="edit" size={24} color="blue" />
+            <Pressable onPress={() => handleEditItem(item)} style={styles.iconButton}>
+              <Icon name="edit" size={24} color="white" />
             </Pressable>
-            <Pressable onPress={() => handleDeleteItem(item.id)}>
+            <Pressable onPress={() => handleDeleteItem(item.id)} style={styles.iconButton}>
               <Icon name="delete" size={24} color="red" />
             </Pressable>
           </View>
@@ -154,13 +158,13 @@ const styles = StyleSheet.create({
     top: 30,
   },
   header: {
-    backgroundColor: "#306A68", // Header background color
+    backgroundColor: "#444",
     padding: 15,
     borderRadius: 5,
     marginBottom: 10,
   },
   headerText: {
-    color: "#fff", // Header text color
+    color: "#fff",
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
@@ -170,8 +174,13 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
-    width: '100%', // Full width for input fields
-    backgroundColor: "#f9f9f9", // Light background for input fields
+    width: '100%',
+    backgroundColor: "grey",
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
   },
   itemContainer: {
     flexDirection: "row",
@@ -179,18 +188,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginVertical: 5,
     padding: 10,
-    backgroundColor: "#fff",
+    backgroundColor: "#444",
     borderRadius: 5,
+  },
+  iconButton: {
+    marginLeft: 10,
   },
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalView: {
-    width: '80%', // Width of the modal
-    backgroundColor: "white",
+    width: '80%',
+    backgroundColor: "grey",
     borderRadius: 10,
     padding: 20,
     alignItems: "center",
@@ -209,7 +221,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
-    width: '100%', // Full width for search input
+    width: '100%',
+    backgroundColor: "grey",
   },
 });
 
