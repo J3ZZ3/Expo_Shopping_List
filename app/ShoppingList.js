@@ -13,6 +13,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useDispatch, useSelector } from "react-redux";
 import { addItem, editItem, deleteItem } from "../redux/useReducer";
+import FAB from '../components/FAB';
 
 const ShoppingList = () => {
   const [itemName, setItemName] = useState("");
@@ -146,6 +147,7 @@ const ShoppingList = () => {
           </View>
         )}
       />
+      <FAB />
     </View>
   );
 };

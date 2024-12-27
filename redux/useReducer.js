@@ -1,5 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const DELETE_ALL_ITEMS = 'DELETE_ALL_ITEMS';
+
 const shoppingListSlice = createSlice({
   name: 'shoppingList',
   initialState: [],
@@ -16,9 +18,12 @@ const shoppingListSlice = createSlice({
     deleteItem: (state, action) => {
       return state.filter(item => item.id !== action.payload);
     },
+    deleteAllItems: () => {
+      return [];
+    },
   },
 });
 
-export const { addItem, editItem, deleteItem } = shoppingListSlice.actions;
+export const { addItem, editItem, deleteItem, deleteAllItems } = shoppingListSlice.actions;
 
 export default shoppingListSlice.reducer;
