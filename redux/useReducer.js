@@ -1,34 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const userlistSlice = createSlice({
-  name: 'usersList',
+const shoppingListSlice = createSlice({
+  name: 'shoppingList',
   initialState: [],
   reducers: {
-    addUsers: (state, action) => {
-      return action.payload;
+    addItem: (state, action) => {
+      state.push(action.payload);
     },
-    addUser: (state, action) => {
-      if (state.length > 0) {
-        state = [action.payload];
-      } else {
-        state = [...state, action.payload];
+    editItem: (state, action) => {
+      const index = state.findIndex(item => item.id === action.payload.id);
+      if (index !== -1) {
+        state[index] = action.payload;
       }
-      return state;
     },
-    updateUser: (state, action) => {
-      return state.map((item) => {
-        if (item.id === action.payload.id) {
-          return action.payload;
-        }
-        return item;
-      });
-    },
-    deleteUser: (state, action) => {
-      return state.filter((item) => item.id !== action.payload);
+    deleteItem: (state, action) => {
+      return state.filter(item => item.id !== action.payload);
     },
   },
 });
 
-export const { addUsers, addUser, updateUser, deleteUser } = userlistSlice.actions;
+export const { addItem, editItem, deleteItem } = shoppingListSlice.actions;
 
-export default userlistSlice.reducer
+export default shoppingListSlice.reducer;

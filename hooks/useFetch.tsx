@@ -1,6 +1,7 @@
 import {useState} from 'react'
 import { useDispatch } from 'react-redux'
 import { addUser, addUsers, deleteUser, updateUser} from '@/redux/useReducer'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type UserType = {
     name: string,
@@ -19,36 +20,19 @@ const useFetch = () => {
         const result = await fetch(link, options)
         const data: UserResponse = await result.json()
 
-        if(options.method === 'DELETE') {
-        //     setState(state => {
-        //         if(!state) return []
-        //         return state.filter(item => item.id !== id)
-        //     })
-        // } else if (options.method === 'PUT') {
-        //     setState(state => {
-        //         if(!state) return [data] as Array<UserType>
-        //         return state.map(item => {
-        //             if((item as UserType).id === id) {
-        //             const userObj: UserType = data as UserType
-        //             return userObj
-        //             }
-        //             return item
-        //         })
+        await AsyncStorage.setItem('shoppingList', JSON.stringify(data));
 
-        //     })
+        if(options.method === 'DELETE') {
+
         dispatch(deleteUser(id))
         } else if (options.method === 'POST') {
-        //     setState(state => {
-        //         return [...state, data as UserType]
                 
-        // })
         dispatch(addUser(data))
     } else {
         const arrayResponse: Array<UserType> = data as Array<UserType>
         dispatch(addUsers(arrayResponse))
     }
     }  catch (error) {
-        // Log the error for debugging
         console.error('Fetch error:', error);
     }
     }
