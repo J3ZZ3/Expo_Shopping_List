@@ -26,8 +26,8 @@ To get started with the project, follow these steps:
 
 1. **Clone the repository**:
    ```bash
-   
-   cd iAmSoDone
+   git clone https://github.com/J3ZZ3/Expo_Shopping_List.git
+   cd Expo_Shopping_List
    ```
 
 2. **Install dependencies**:
