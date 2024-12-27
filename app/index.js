@@ -1,12 +1,10 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import ShoppingList from './ShoppingList';
+import { StyleSheet } from 'react-native';
+import Layout from './_layout';
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <ShoppingList />
-    </View>
+    <Layout />
   );
 }
 
@@ -15,5 +13,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
+    backgroundColor: '#000000'
   },
 });

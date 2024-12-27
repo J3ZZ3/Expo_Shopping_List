@@ -1,20 +1,38 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, Pressable, TextInput, StyleSheet, Modal, Button, CheckBox } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import { addItem, editItem, deleteItem } from '../redux/useReducer';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  Pressable,
+  TextInput,
+  StyleSheet,
+  Modal,
+  Button,
+  Switch,
+} from "react-native";
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useDispatch, useSelector } from "react-redux";
+import { addItem, editItem, deleteItem } from "../redux/useReducer";
 
 const ShoppingList = () => {
-  const [itemName, setItemName] = useState('');
-  const [itemQuantity, setItemQuantity] = useState('');
+  const [itemName, setItemName] = useState("");
+  const [itemQuantity, setItemQuantity] = useState("");
   const [itemId, setItemId] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const dispatch = useDispatch();
-  const shoppingList = useSelector(state => state.shoppingList);
+  const shoppingList = useSelector((state) => state.shoppingList);
 
   const handleAddItem = () => {
     if (itemName.trim() && itemQuantity.trim()) {
-      dispatch(addItem({ id: Date.now().toString(), name: itemName, quantity: itemQuantity, purchased: false }));
+      dispatch(
+        addItem({
+          id: Date.now().toString(),
+          name: itemName,
+          quantity: itemQuantity,
+          purchased: false,
+        })
+      );
       resetModal();
     }
   };
@@ -28,13 +46,15 @@ const ShoppingList = () => {
 
   const handleUpdateItem = () => {
     if (itemId && itemName.trim() && itemQuantity.trim()) {
-      dispatch(editItem({ id: itemId, name: itemName, quantity: itemQuantity }));
+      dispatch(
+        editItem({ id: itemId, name: itemName, quantity: itemQuantity })
+      );
       resetModal();
     }
   };
 
   const handleTogglePurchased = (id) => {
-    const item = shoppingList.find(item => item.id === id);
+    const item = shoppingList.find((item) => item.id === id);
     if (item) {
       dispatch(editItem({ ...item, purchased: !item.purchased }));
     }
@@ -45,18 +65,21 @@ const ShoppingList = () => {
   };
 
   const resetModal = () => {
-    setItemName('');
-    setItemQuantity('');
+    setItemName("");
+    setItemQuantity("");
     setItemId(null);
     setModalVisible(false);
   };
 
-  const filteredShoppingList = shoppingList.filter(item =>
+  const filteredShoppingList = shoppingList.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Shopping List</Text>
+      </View>
       <TextInput
         placeholder="Search Items"
         value={searchQuery}
@@ -70,20 +93,27 @@ const ShoppingList = () => {
         visible={modalVisible}
         onRequestClose={resetModal}
       >
-        <View style={styles.modalView}>
-          <TextInput
-            placeholder="Item Name"
-            value={itemName}
-            onChangeText={setItemName}
-          />
-          <TextInput
-            placeholder="Quantity"
-            value={itemQuantity}
-            onChangeText={setItemQuantity}
-            keyboardType="numeric"
-          />
-          <Button title={itemId ? "Update" : "Add"} onPress={itemId ? handleUpdateItem : handleAddItem} />
-          <Button title="Cancel" onPress={resetModal} />
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalView}>
+            <TextInput
+              placeholder="Item Name"
+              value={itemName}
+              onChangeText={setItemName}
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Quantity"
+              value={itemQuantity}
+              onChangeText={setItemQuantity}
+              keyboardType="numeric"
+              style={styles.input}
+            />
+            <Button
+              title={itemId ? "Update" : "Add"}
+              onPress={itemId ? handleUpdateItem : handleAddItem}
+            />
+            <Button title="Cancel" onPress={resetModal} />
+          </View>
         </View>
       </Modal>
       <FlatList
@@ -91,18 +121,23 @@ const ShoppingList = () => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
-            <CheckBox
+            <Switch
               value={item.purchased}
               onValueChange={() => handleTogglePurchased(item.id)}
             />
-            <Text style={{ textDecorationLine: item.purchased ? 'line-through' : 'none' }}>
+            <Text
+              style={{
+                textDecorationLine: item.purchased ? "line-through" : "none",
+                flex: 1, // Allow text to take available space
+              }}
+            >
               {item.name} ({item.quantity})
             </Text>
             <Pressable onPress={() => handleEditItem(item)}>
-              <Text style={styles.editText}>Edit</Text>
+              <Icon name="edit" size={24} color="blue" />
             </Pressable>
             <Pressable onPress={() => handleDeleteItem(item.id)}>
-              <Text style={styles.deleteText}>Delete</Text>
+              <Icon name="delete" size={24} color="red" />
             </Pressable>
           </View>
         )}
@@ -112,28 +147,54 @@ const ShoppingList = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 20, backgroundColor: '#f8f8f8' },
-  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 5 },
-  button: { backgroundColor: '#306A68', padding: 10, alignItems: 'center' },
-  buttonText: { color: 'white' },
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "transparent",
+    top: 30,
+  },
+  header: {
+    backgroundColor: "#306A68", // Header background color
+    padding: 15,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  headerText: {
+    color: "#fff", // Header text color
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  input: {
+    borderWidth: 1,
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+    width: '100%', // Full width for input fields
+    backgroundColor: "#f9f9f9", // Light background for input fields
+  },
   itemContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginVertical: 5,
     padding: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 5,
   },
-  editText: { color: 'blue' },
-  deleteText: { color: 'red' },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
+  },
   modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
+    width: '80%', // Width of the modal
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -144,11 +205,12 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
+    width: '100%', // Full width for search input
   },
 });
 
-export default ShoppingList; 
+export default ShoppingList;
