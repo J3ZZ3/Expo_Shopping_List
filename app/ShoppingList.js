@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, Pressable, TextInput, StyleSheet, Modal, Button } from 'react-native';
+import { View, Text, FlatList, Pressable, TextInput, StyleSheet, Modal, Button, CheckBox } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { addItem, editItem, deleteItem } from '../redux/useReducer';
 
@@ -14,7 +14,7 @@ const ShoppingList = () => {
 
   const handleAddItem = () => {
     if (itemName.trim() && itemQuantity.trim()) {
-      dispatch(addItem({ id: Date.now().toString(), name: itemName, quantity: itemQuantity }));
+      dispatch(addItem({ id: Date.now().toString(), name: itemName, quantity: itemQuantity, purchased: false }));
       resetModal();
     }
   };
@@ -30,6 +30,13 @@ const ShoppingList = () => {
     if (itemId && itemName.trim() && itemQuantity.trim()) {
       dispatch(editItem({ id: itemId, name: itemName, quantity: itemQuantity }));
       resetModal();
+    }
+  };
+
+  const handleTogglePurchased = (id) => {
+    const item = shoppingList.find(item => item.id === id);
+    if (item) {
+      dispatch(editItem({ ...item, purchased: !item.purchased }));
     }
   };
 
@@ -84,7 +91,13 @@ const ShoppingList = () => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
-            <Text>{item.name} ({item.quantity})</Text>
+            <CheckBox
+              value={item.purchased}
+              onValueChange={() => handleTogglePurchased(item.id)}
+            />
+            <Text style={{ textDecorationLine: item.purchased ? 'line-through' : 'none' }}>
+              {item.name} ({item.quantity})
+            </Text>
             <Pressable onPress={() => handleEditItem(item)}>
               <Text style={styles.editText}>Edit</Text>
             </Pressable>
@@ -103,7 +116,15 @@ const styles = StyleSheet.create({
   input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 5 },
   button: { backgroundColor: '#306A68', padding: 10, alignItems: 'center' },
   buttonText: { color: 'white' },
-  itemContainer: { flexDirection: 'row', justifyContent: 'space-between', marginVertical: 5, padding: 10, backgroundColor: '#fff', borderRadius: 5 },
+  itemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginVertical: 5,
+    padding: 10,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+  },
   editText: { color: 'blue' },
   deleteText: { color: 'red' },
   modalView: {
