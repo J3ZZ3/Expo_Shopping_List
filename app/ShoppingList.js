@@ -5,32 +5,31 @@ import { addItem, editItem, deleteItem } from '../redux/useReducer';
 
 const ShoppingList = () => {
   const [itemName, setItemName] = useState('');
-  const [itemId, setItemId] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
   const [itemQuantity, setItemQuantity] = useState('');
+  const [itemId, setItemId] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const dispatch = useDispatch();
   const shoppingList = useSelector(state => state.shoppingList);
 
   const handleAddItem = () => {
     if (itemName.trim() && itemQuantity.trim()) {
       dispatch(addItem({ id: Date.now().toString(), name: itemName, quantity: itemQuantity }));
-      setItemName('');
-      setItemQuantity('');
-      setModalVisible(false);
+      resetModal();
     }
   };
 
   const handleEditItem = (item) => {
     setItemName(item.name);
+    setItemQuantity(item.quantity);
     setItemId(item.id);
+    setModalVisible(true);
   };
 
   const handleUpdateItem = () => {
-    if (itemId && itemName.trim()) {
-      dispatch(editItem({ id: itemId, name: itemName }));
-      setItemName('');
-      setItemId(null);
+    if (itemId && itemName.trim() && itemQuantity.trim()) {
+      dispatch(editItem({ id: itemId, name: itemName, quantity: itemQuantity }));
+      resetModal();
     }
   };
 
@@ -38,18 +37,31 @@ const ShoppingList = () => {
     dispatch(deleteItem(id));
   };
 
-  const filteredList = shoppingList.filter(item => 
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const resetModal = () => {
+    setItemName('');
+    setItemQuantity('');
+    setItemId(null);
+    setModalVisible(false);
+  };
+
+  const filteredShoppingList = shoppingList.filter(item =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <View style={styles.container}>
+      <TextInput
+        placeholder="Search Items"
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        style={styles.searchInput}
+      />
       <Button title="Add Item" onPress={() => setModalVisible(true)} />
       <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
+        onRequestClose={resetModal}
       >
         <View style={styles.modalView}>
           <TextInput
@@ -63,19 +75,13 @@ const ShoppingList = () => {
             onChangeText={setItemQuantity}
             keyboardType="numeric"
           />
-          <Button title="Add" onPress={handleAddItem} />
-          <Button title="Cancel" onPress={() => setModalVisible(false)} />
+          <Button title={itemId ? "Update" : "Add"} onPress={itemId ? handleUpdateItem : handleAddItem} />
+          <Button title="Cancel" onPress={resetModal} />
         </View>
       </Modal>
-      <TextInput
-        style={styles.input}
-        placeholder="Search items..."
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-      />
       <FlatList
-        data={filteredList}
-        keyExtractor={item => item.id}
+        data={filteredShoppingList}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
             <Text>{item.name} ({item.quantity})</Text>
@@ -114,6 +120,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  searchInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
   },
 });
 
