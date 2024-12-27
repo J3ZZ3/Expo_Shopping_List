@@ -1,6 +1,6 @@
-# iAmSoDone
+# Expo Shopping List
 
-iAmSoDone is a React Native application designed to help users manage their shopping lists efficiently. The app allows users to add, edit, delete, and search for items in their shopping list. It utilizes Redux for state management and Expo for a smooth development experience.
+Expo Shopping List is a React Native application designed to help users manage their shopping lists efficiently. The app allows users to add, edit, delete, and search for items in their shopping list. It utilizes Redux for state management and Expo for a smooth development experience.
 
 ## Features
 
@@ -26,7 +26,7 @@ To get started with the project, follow these steps:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/iAmSoDone.git
+   
    cd iAmSoDone
    ```
 
