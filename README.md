@@ -59,6 +59,4 @@ To get started with the project, follow these steps:
 - You can edit or delete items by pressing the corresponding buttons next to each item.
 - Use the search bar to filter items in the list.
 
-## Environment Variables
 
-The project uses an environment variable for the mock API URL. Create a `.env` file in the root directory and add the following line:
