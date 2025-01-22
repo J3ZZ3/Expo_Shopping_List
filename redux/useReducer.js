@@ -21,9 +21,12 @@ const shoppingListSlice = createSlice({
     deleteAllItems: () => {
       return [];
     },
+    loadItems: (state, action) => {
+      return action.payload;
+    },
   },
 });
 
-export const { addItem, editItem, deleteItem, deleteAllItems } = shoppingListSlice.actions;
+export const { addItem, editItem, deleteItem, deleteAllItems, loadItems } = shoppingListSlice.actions;
 
 export default shoppingListSlice.reducer;

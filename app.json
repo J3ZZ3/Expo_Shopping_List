@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "iAmSoDone",
+    "name": "Listify",
     "slug": "iAmSoDone",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,14 +13,26 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.loganjesse.Listify",
+      "splash": {
+        "image": "./assets/images/splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.loganjesse.iAmSoDone"
+      "package": "com.loganjesse.Listify",
+      "permissions": [],
+      "splash": {
+        "image": "./assets/images/splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      }
     },
     "web": {
       "bundler": "metro",
@@ -38,7 +50,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "ddaf9879-3c28-4325-93e5-8b2cdc27cdaf"
+        "projectId": "367f84ad-bf15-4d2e-aa95-0438688d16b4"
       }
     }
   }

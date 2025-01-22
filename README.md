@@ -1,6 +1,16 @@
 # Expo Shopping List
 
+![Expo Shopping List Banner](assets/banner.png)
+
 Expo Shopping List is a React Native application designed to help users manage their shopping lists efficiently. The app allows users to add, edit, delete, and search for items in their shopping list. It utilizes Redux for state management and Expo for a smooth development experience.
+
+## Screenshots
+
+<div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+    <img src="assets/screenshots/home-screen.png" alt="Home Screen" width="200"/>
+    <img src="assets/screenshots/add-item.png" alt="Add Item Screen" width="200"/>
+    <img src="assets/screenshots/search-items.png" alt="Search Items" width="200"/>
+</div>
 
 ## Features
 

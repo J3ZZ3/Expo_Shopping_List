@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,11 +9,13 @@ import {
   Modal,
   Button,
   Switch,
+  Alert,
 } from "react-native";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useDispatch, useSelector } from "react-redux";
-import { addItem, editItem, deleteItem } from "../redux/useReducer";
+import { addItem, editItem, deleteItem, loadItems } from "../redux/useReducer";
 import FAB from '../components/FAB';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ShoppingList = () => {
   const [itemName, setItemName] = useState("");
@@ -23,6 +25,37 @@ const ShoppingList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const dispatch = useDispatch();
   const shoppingList = useSelector((state) => state.shoppingList);
+
+  // Load saved items when component mounts
+  useEffect(() => {
+    loadSavedItems();
+  }, []);
+
+  // Save items whenever the list changes
+  useEffect(() => {
+    saveItems();
+  }, [shoppingList]);
+
+  const loadSavedItems = async () => {
+    try {
+      const savedItems = await AsyncStorage.getItem('shoppingList');
+      if (savedItems) {
+        const parsedItems = JSON.parse(savedItems);
+        dispatch(loadItems(parsedItems));
+      }
+    } catch (error) {
+      console.error('Error loading items:', error);
+      Alert.alert('Error', 'Failed to load shopping list');
+    }
+  };
+
+  const saveItems = async () => {
+    try {
+      await AsyncStorage.setItem('shoppingList', JSON.stringify(shoppingList));
+    } catch (error) {
+      console.error('Error saving items:', error);
+    }
+  };
 
   const handleAddItem = () => {
     if (itemName.trim() && itemQuantity.trim()) {
@@ -120,33 +153,41 @@ const ShoppingList = () => {
           </View>
         </View>
       </Modal>
-      <FlatList
-        data={filteredShoppingList}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.itemContainer}>
-            <Switch
-              value={item.purchased}
-              onValueChange={() => handleTogglePurchased(item.id)}
-            />
-            <Text
-              style={{
-                textDecorationLine: item.purchased ? "line-through" : "none",
-                flex: 1,
-                color: item.purchased ? "#aaa" : "#fff",
-              }}
-            >
-              {item.name} ({item.quantity})
-            </Text>
-            <Pressable onPress={() => handleEditItem(item)} style={styles.iconButton}>
-              <Icon name="edit" size={24} color="white" />
-            </Pressable>
-            <Pressable onPress={() => handleDeleteItem(item.id)} style={styles.iconButton}>
-              <Icon name="delete" size={24} color="red" />
-            </Pressable>
-          </View>
-        )}
-      />
+      {filteredShoppingList.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyStateText}>
+            {searchQuery ? 'No items match your search' : 'Your shopping list is empty'}
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredShoppingList}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.itemContainer}>
+              <Switch
+                value={item.purchased}
+                onValueChange={() => handleTogglePurchased(item.id)}
+              />
+              <Text
+                style={{
+                  textDecorationLine: item.purchased ? "line-through" : "none",
+                  flex: 1,
+                  color: item.purchased ? "#aaa" : "#fff",
+                }}
+              >
+                {item.name} ({item.quantity})
+              </Text>
+              <Pressable onPress={() => handleEditItem(item)} style={styles.iconButton}>
+                <Icon name="edit" size={24} color="white" />
+              </Pressable>
+              <Pressable onPress={() => handleDeleteItem(item.id)} style={styles.iconButton}>
+                <Icon name="delete" size={24} color="red" />
+              </Pressable>
+            </View>
+          )}
+        />
+      )}
       <FAB />
     </View>
   );
@@ -225,6 +266,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     width: '100%',
     backgroundColor: "grey",
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyStateText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 
