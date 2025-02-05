@@ -1,11 +1,14 @@
 import React from 'react';
-import { View, Text, FlatList, Pressable, StyleSheet, Alert, Platform, Animated } from 'react-native';
+import { View, Text, FlatList, Pressable, StyleSheet, Alert, Platform, Animated, Share } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadSavedList, deleteSavedList } from '../redux/useReducer';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ImageBackground } from 'react-native';
 import backgroundImage from '../assets/images/pantry.jpg';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SavedLists() {
   const router = useRouter();
@@ -30,6 +33,38 @@ export default function SavedLists() {
     ).start();
   }, []);
 
+  React.useEffect(() => {
+    loadSavedListsFromStorage();
+  }, []);
+
+  React.useEffect(() => {
+    saveSavedListsToStorage();
+  }, [savedLists]);
+
+  const loadSavedListsFromStorage = async () => {
+    try {
+      const savedListsJson = await AsyncStorage.getItem('savedLists');
+      if (savedListsJson) {
+        const lists = JSON.parse(savedListsJson);
+        lists.forEach(list => {
+          dispatch({ type: 'ADD_SAVED_LIST', payload: list });
+        });
+      }
+    } catch (error) {
+      console.error('Error loading saved lists:', error);
+      Alert.alert('Error', 'Failed to load saved lists');
+    }
+  };
+
+  const saveSavedListsToStorage = async () => {
+    try {
+      await AsyncStorage.setItem('savedLists', JSON.stringify(savedLists));
+    } catch (error) {
+      console.error('Error saving lists:', error);
+      Alert.alert('Error', 'Failed to save lists');
+    }
+  };
+
   const handleLoadList = (list) => {
     dispatch(loadSavedList(list));
     router.back();
@@ -48,6 +83,63 @@ export default function SavedLists() {
         }
       ]
     );
+  };
+
+  const generateHTML = (list) => {
+    const itemsList = list.items.map(item => 
+      `<tr>
+        <td>${item.name}</td>
+        <td>${item.quantity}</td>
+        <td>${item.category}</td>
+        <td>${item.purchased ? 'Yes' : 'No'}</td>
+      </tr>`
+    ).join('');
+
+    return `
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; }
+            h1 { color: #333; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+          </style>
+        </head>
+        <body>
+          <h1>${list.name}</h1>
+          <p>Created: ${new Date(list.createdAt).toLocaleDateString()}</p>
+          <table>
+            <tr>
+              <th>Item</th>
+              <th>Quantity</th>
+              <th>Category</th>
+              <th>Purchased</th>
+            </tr>
+            ${itemsList}
+          </table>
+        </body>
+      </html>
+    `;
+  };
+
+  const handleShareList = async (list) => {
+    try {
+      const html = generateHTML(list);
+      const { uri } = await Print.printToFileAsync({
+        html,
+        base64: false
+      });
+      
+      await Sharing.shareAsync(uri, {
+        mimeType: 'application/pdf',
+        dialogTitle: `Share ${list.name}`,
+        UTI: 'com.adobe.pdf'
+      });
+    } catch (error) {
+      Alert.alert('Error', 'Failed to share list');
+      console.error(error);
+    }
   };
 
   return (
@@ -93,12 +185,20 @@ export default function SavedLists() {
                       {item.items.length} items
                     </Text>
                   </View>
-                  <Pressable 
-                    onPress={() => handleDeleteList(item.id)}
-                    style={styles.deleteButton}
-                  >
-                    <Icon name="delete" size={24} color="red" />
-                  </Pressable>
+                  <View style={styles.buttonContainer}>
+                    <Pressable 
+                      onPress={() => handleShareList(item)}
+                      style={styles.iconButton}
+                    >
+                      <Icon name="share" size={24} color="white" />
+                    </Pressable>
+                    <Pressable 
+                      onPress={() => handleDeleteList(item.id)}
+                      style={styles.deleteButton}
+                    >
+                      <Icon name="delete" size={24} color="red" />
+                    </Pressable>
+                  </View>
                 </Pressable>
               )}
             />
@@ -166,6 +266,14 @@ const styles = StyleSheet.create({
   itemCount: {
     color: '#ddd',
     fontSize: 14,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconButton: {
+    padding: 10,
+    marginRight: 10,
   },
   deleteButton: {
     padding: 10,

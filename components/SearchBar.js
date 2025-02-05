@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     width: '100%',
     backgroundColor: "grey",
+    color: 'white'
   },
 });
 

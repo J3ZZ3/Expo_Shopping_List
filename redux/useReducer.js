@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const DELETE_ALL_ITEMS = 'DELETE_ALL_ITEMS';
+export const ADD_SAVED_LIST = 'ADD_SAVED_LIST';
 
 const shoppingListSlice = createSlice({
   name: 'shoppingList',
@@ -49,13 +50,32 @@ const shoppingListSlice = createSlice({
     },
     deleteSavedList: (state, action) => {
       state.savedLists = state.savedLists.filter(list => list.id !== action.payload);
-    }
+    },
+    addSavedList: (state, action) => {
+      const listExists = state.savedLists.some(list => list.id === action.payload.id);
+      if (listExists) {
+        return state;
+      }
+      return {
+        ...state,
+        savedLists: [...state.savedLists, action.payload],
+      };
+    },
+    saveCurrentList: (state, action) => {
+      const newList = {
+        id: Date.now().toString(),
+        name: action.payload.name,
+        items: state.currentList,
+        createdAt: new Date().toISOString(),
+      };
+      state.savedLists.push(newList);
+    },
   },
 });
 
 export const { 
   addItem, editItem, deleteItem, deleteAllItems, loadItems,
-  saveCurrentList, loadSavedList, deleteSavedList 
+  saveCurrentList, loadSavedList, deleteSavedList, addSavedList
 } = shoppingListSlice.actions;
 
 export default shoppingListSlice.reducer;

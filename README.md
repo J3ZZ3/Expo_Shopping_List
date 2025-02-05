@@ -1,62 +1,117 @@
-# Expo Shopping List
+# Listify - Shopping List Manager
 
-![Expo Shopping List Banner](assets/banner.gif)
-
-Expo Shopping List is a React Native application designed to help users manage their shopping lists efficiently. The app allows users to add, edit, delete, and search for items in their shopping list. It utilizes Redux for state management and Expo for a smooth development experience.
-
-## Screenshots
-
-<div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-    <img src="assets/screenshots/home-screen.jpg" alt="Home Screen" width="200"/>
-    <img src="assets/screenshots/add-item.jpg" alt="Add Item Screen" width="200"/>
-    <img src="assets/screenshots/splash-screen.jpg" alt="Search Items" width="200"/>
-</div>
+## Overview
+Listify is a modern, feature-rich shopping list management application built with React Native and Expo. It provides users with an intuitive interface to create, manage, and organize their shopping lists efficiently.
 
 ## Features
 
-- **Add Items**: Users can add items to their shopping list with a name and quantity.
-- **Edit Items**: Users can edit existing items in the list.
-- **Delete Items**: Users can remove items from their shopping list.
-- **Search Functionality**: Users can search for items in the list.
-- **Persistent Storage**: The app uses AsyncStorage to persist the shopping list data.
-- **Responsive Design**: The app is designed to work on both iOS and Android devices.
+### Core Functionality
+- **List Management**
+  - Create and manage multiple shopping lists
+  - Add, edit, and delete items
+  - Mark items as purchased/unpurchased
+  - Categorize items for better organization
+  - Add notes to items for additional details
 
-## Technologies Used
+### User Interface
+- **Modern Design**
+  - Clean, intuitive interface
+  - Dark theme 
+  - Responsive layout for various screen sizes
+  - Smooth animations and transitions
 
-- **React Native**: For building the mobile application.
-- **Redux**: For state management.
-- **Expo**: For a streamlined development process.
-- **React Navigation**: For navigating between different screens.
-- **React Native Vector Icons**: For using icons in the app.
-- **AsyncStorage**: For persisting data locally.
+### Organization
+- **Categories**
+  - Group items by categories
+  - Filter items by category
+  - Custom category management
+
+### Search & Filter
+- **Advanced Search**
+  - Real-time search functionality
+  - Filter by item status (purchased/unpurchased)
+  - Category-based filtering
+
+### Data Management
+- **List Operations**
+  - Save lists for future use
+  - Share lists as PDF
+  - Share lists with others
+  - Clear entire lists with confirmation
+
+### Additional Features
+- **Tutorial System**
+  - Interactive onboarding
+  - Help documentation
+  - Feature discovery
+
+## Technical Architecture
+
+### Frontend Framework
+- React Native
+- Expo Framework
+- React Navigation (Stack Navigation)
+
+### State Management
+- Redux Toolkit
+- AsyncStorage for persistence
+
+### UI Components
+- Custom components
+- React Native Vector Icons
+- Native modals and animations
 
 ## Installation
 
-To get started with the project, follow these steps:
+1. Clone the repository:
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/J3ZZ3/Expo_Shopping_List.git
-   cd Expo_Shopping_List
-   ```
+```bash
+git clone https://github.com/J3ZZ3/Expo_Shopping_List.git
+```
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+2. Install dependencies:
+```bash
+cd Expo_Shopping_List
+npm install
+```
 
-3. **Run the app**:
-   ```bash
-   npm start
-   ```
+3. Start project:
+```bash
+npx expo start
+```
 
-   This will start the Expo development server. You can then scan the QR code with the Expo Go app on your mobile device or run it in an emulator.
+### Prerequisites
+- Node.js (v14 or higher)
+- npm or yarn
+- Expo CLI
+- iOS Simulator or Android Emulator (optional)
 
-## Usage
 
-- Open the app and you will see the shopping list interface.
-- Use the "Add Item" button to add new items.
-- You can edit or delete items by pressing the corresponding buttons next to each item.
-- Use the search bar to filter items in the list.
+## Building and Deployment
+
+### Development Build
+```bash
+expo build:android -t apk  
+expo build:ios            
+```
+
+### Production Build
+Configure in `eas.json`:
+```json
+{
+  "build": {
+    "production": {
+      "autoIncrement": true,
+      "android": {
+        "buildType": "apk"
+      }
+    }
+  }
+}
+```
+
+## Acknowledgments
+- React Native community
+- Expo team
 
 
