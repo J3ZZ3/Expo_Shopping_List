@@ -1,7 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { View, Text, StyleSheet, TextInput, Button } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { editItem } from '../../../redux/useReducer';
+import { editItem } from '../../redux/useReducer';
 
 export default function ItemDetails() {
   const { id } = useLocalSearchParams();

@@ -1,18 +1,23 @@
-import React from 'react';
-import { StyleSheet } from 'react-native';
-import Layout from './_layout';
+import { ImageBackground, StyleSheet } from 'react-native';
+import ShoppingList from './ShoppingList';
+import backgroundImage from '../assets/images/shopping.jpg';
 
-export default function App() {
+export default function Home() {
   return (
-    <Layout />
+    <ImageBackground 
+      source={backgroundImage} 
+      style={styles.background} 
+      resizeMode="cover"
+    >
+      
+      <ShoppingList />
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
-    justifyContent: 'center',
-    padding: 20,
-    backgroundColor: '#000000'
+    backgroundColor: 'transparent',
   },
 });

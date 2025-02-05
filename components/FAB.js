@@ -1,8 +1,7 @@
 import React from 'react'
-import { Link } from 'expo-router'
-import { View, Pressable, Alert } from 'react-native'
+import { View, Pressable, StyleSheet, Platform, Alert } from 'react-native'
 import { useDispatch } from 'react-redux'
-import { deleteAllItems, addItem } from '../redux/useReducer'
+import { deleteAllItems } from '../redux/useReducer'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 
 const FAB = () => {
@@ -27,21 +26,30 @@ const FAB = () => {
 
   return (
     <View>
-      <Pressable onPress={handleClearList} style={{
-        height: 50,
-        width: 50,
-        borderRadius: 25,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#ff0000',
-        position: 'absolute',
-        bottom: 50,
-        right: 260
-      }}>
-        <Icon name="delete" size={30} color="#fff" />
+      <Pressable 
+        onPress={handleClearList} 
+        style={styles.fab}
+        android_ripple={{ color: '#ff4444', radius: 28 }}
+      >
+        <Icon name="delete" size={24} color="#fff" />
       </Pressable>
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  fab: {
+    height: 56,
+    width: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ff0000',
+    position: 'absolute',
+    bottom: 16,
+    left: 16,
+
+  }
+});
 
 export default FAB

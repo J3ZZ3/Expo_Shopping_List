@@ -11,13 +11,18 @@ import {
   Switch,
   Alert,
   ScrollView,
-  Picker,
+  Platform,
 } from "react-native";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useDispatch, useSelector } from "react-redux";
-import { addItem, editItem, deleteItem, loadItems } from "../redux/useReducer";
+import { addItem, editItem, deleteItem, loadItems, saveCurrentList } from "../redux/useReducer";
 import FAB from '../components/FAB';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
+import { Picker } from '@react-native-picker/picker';
+import SearchBar from '../components/SearchBar'
+import ItemDetail from '../components/ItemDetail';
+import Header from '../components/Header';
 
 const ShoppingList = () => {
   const [itemName, setItemName] = useState("");
@@ -28,8 +33,13 @@ const ShoppingList = () => {
   const [itemCategory, setItemCategory] = useState("Uncategorized");
   const [itemNotes, setItemNotes] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [saveListModalVisible, setSaveListModalVisible] = useState(false);
+  const [listName, setListName] = useState("");
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
   const dispatch = useDispatch();
-  const shoppingList = useSelector((state) => state.shoppingList);
+  const shoppingList = useSelector((state) => state.shoppingList.currentList);
+  const router = useRouter();
 
   const categories = ["All", "Produce", "Dairy", "Meat", "Pantry", "Household", "Other", "Uncategorized"];
 
@@ -119,7 +129,21 @@ const ShoppingList = () => {
     setModalVisible(false);
   };
 
-  const filteredShoppingList = shoppingList
+  const handleSaveList = () => {
+    if (listName.trim()) {
+      dispatch(saveCurrentList({ name: listName }));
+      setListName("");
+      setSaveListModalVisible(false);
+      Alert.alert("Success", "List saved successfully!");
+    }
+  };
+
+  const handleItemPress = (item) => {
+    setSelectedItem(item);
+    setDetailModalVisible(true);
+  };
+
+  const filteredShoppingList = (shoppingList || [])
     .filter((item) =>
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
       (selectedCategory === "All" || item.category === selectedCategory)
@@ -127,15 +151,8 @@ const ShoppingList = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Shopping List</Text>
-      </View>
-      <TextInput
-        placeholder="Search Items"
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-        style={styles.searchInput}
-      />
+      <Header />
+      <SearchBar/>
       <View style={styles.categoryFilter}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {categories.map((category) => (
@@ -152,7 +169,7 @@ const ShoppingList = () => {
           ))}
         </ScrollView>
       </View>
-      <Button title="Add Item" onPress={() => setModalVisible(true)} color="#444" />
+      <Button title="Add Item" onPress={() => setModalVisible(true)} color="#444"  />
       <Modal
         animationType="slide"
         transparent={true}
@@ -201,6 +218,31 @@ const ShoppingList = () => {
           </View>
         </View>
       </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={saveListModalVisible}
+        onRequestClose={() => setSaveListModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalView}>
+            <TextInput
+              placeholder="List Name"
+              value={listName}
+              onChangeText={setListName}
+              style={styles.input}
+            />
+            <View style={styles.buttonContainer}>
+              <Button title="Save" onPress={handleSaveList} color="#000" />
+              <Button 
+                title="Cancel" 
+                onPress={() => setSaveListModalVisible(false)} 
+                color="#000" 
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
       {filteredShoppingList.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyStateText}>
@@ -212,31 +254,50 @@ const ShoppingList = () => {
           data={filteredShoppingList}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View style={styles.itemContainer}>
-              <Switch
-                value={item.purchased}
-                onValueChange={() => handleTogglePurchased(item.id)}
-              />
-              <Text
-                style={{
-                  textDecorationLine: item.purchased ? "line-through" : "none",
-                  flex: 1,
-                  color: item.purchased ? "#aaa" : "#fff",
-                }}
-              >
-                {item.name} ({item.quantity})
-              </Text>
-              <Pressable onPress={() => handleEditItem(item)} style={styles.iconButton}>
-                <Icon name="edit" size={24} color="white" />
-              </Pressable>
-              <Pressable onPress={() => handleDeleteItem(item.id)} style={styles.iconButton}>
-                <Icon name="delete" size={24} color="red" />
-              </Pressable>
-            </View>
+            <Pressable onPress={() => handleItemPress(item)}>
+              <View style={styles.itemContainer}>
+                <Pressable onPress={() => handleTogglePurchased(item.id)} style={styles.checkbox}>
+                  <Icon 
+                    name={item.purchased ? "check-box" : "check-box-outline-blank"} 
+                    size={24} 
+                    color="white" 
+                  />
+                </Pressable>
+                <Text
+                  style={{
+                    textDecorationLine: item.purchased ? "line-through" : "none",
+                    flex: 1,
+                    color: item.purchased ? "#aaa" : "#fff",
+                  }}
+                >
+                  {item.name} ({item.quantity})
+                </Text>
+                <Pressable onPress={() => handleEditItem(item)} style={styles.iconButton}>
+                  <Icon name="edit" size={24} color="white" />
+                </Pressable>
+                <Pressable onPress={() => handleDeleteItem(item.id)} style={styles.iconButton}>
+                  <Icon name="delete" size={24} color="red" />
+                </Pressable>
+              </View>
+            </Pressable>
           )}
         />
       )}
       <FAB />
+      <Pressable 
+        style={styles.saveFAB}
+        onPress={() => setSaveListModalVisible(true)}
+      >
+        <Icon name="save" size={24} color="white" />
+      </Pressable>
+      <ItemDetail 
+        item={selectedItem}
+        visible={detailModalVisible}
+        onClose={() => {
+          setDetailModalVisible(false);
+          setSelectedItem(null);
+        }}
+      />
     </View>
   );
 };
@@ -246,19 +307,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "transparent",
-    top: 30,
-  },
-  header: {
-    backgroundColor: "#444",
-    padding: 15,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  headerText: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
+    paddingTop: Platform.OS === 'android' ? 40 : 30,
   },
   input: {
     borderWidth: 1,
@@ -292,19 +341,15 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalView: {
-    width: '80%',
-    backgroundColor: "grey",
+    width: '90%',
+    backgroundColor: Platform.select({
+      ios: "grey",
+      android: "#333"
+    }),
     borderRadius: 10,
     padding: 20,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+
   },
   searchInput: {
     borderWidth: 1,
@@ -322,8 +367,9 @@ const styles = StyleSheet.create({
   },
   emptyStateText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 20,
     textAlign: 'center',
+    fontWeight: 'bold',
   },
   categoryFilter: {
     marginVertical: 10,
@@ -340,17 +386,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#666',
   },
   categoryChipText: {
+    padding: 1,
     color: '#fff',
   },
   picker: {
     width: '100%',
-    backgroundColor: 'grey',
     marginBottom: 10,
+    color: '#fff',
   },
   notesText: {
     color: '#aaa',
     fontSize: 12,
     marginTop: 5,
+  },
+  saveFAB: {
+    position: 'absolute',
+    right: 30,
+    bottom: 37,
+    backgroundColor: '#444',
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkbox: {
+    marginRight: 10,
   },
 });
 
