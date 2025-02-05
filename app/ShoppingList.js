@@ -10,6 +10,8 @@ import {
   Button,
   Switch,
   Alert,
+  ScrollView,
+  Picker,
 } from "react-native";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useDispatch, useSelector } from "react-redux";
@@ -23,8 +25,13 @@ const ShoppingList = () => {
   const [itemId, setItemId] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [itemCategory, setItemCategory] = useState("Uncategorized");
+  const [itemNotes, setItemNotes] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const dispatch = useDispatch();
   const shoppingList = useSelector((state) => state.shoppingList);
+
+  const categories = ["All", "Produce", "Dairy", "Meat", "Pantry", "Household", "Other", "Uncategorized"];
 
   // Load saved items when component mounts
   useEffect(() => {
@@ -64,7 +71,10 @@ const ShoppingList = () => {
           id: Date.now().toString(),
           name: itemName,
           quantity: itemQuantity,
+          category: itemCategory,
+          notes: itemNotes,
           purchased: false,
+          createdAt: new Date().toISOString(),
         })
       );
       resetModal();
@@ -75,13 +85,15 @@ const ShoppingList = () => {
     setItemName(item.name);
     setItemQuantity(item.quantity);
     setItemId(item.id);
+    setItemCategory(item.category);
+    setItemNotes(item.notes);
     setModalVisible(true);
   };
 
   const handleUpdateItem = () => {
     if (itemId && itemName.trim() && itemQuantity.trim()) {
       dispatch(
-        editItem({ id: itemId, name: itemName, quantity: itemQuantity })
+        editItem({ id: itemId, name: itemName, quantity: itemQuantity, category: itemCategory, notes: itemNotes })
       );
       resetModal();
     }
@@ -102,12 +114,16 @@ const ShoppingList = () => {
     setItemName("");
     setItemQuantity("");
     setItemId(null);
+    setItemCategory("Uncategorized");
+    setItemNotes("");
     setModalVisible(false);
   };
 
-  const filteredShoppingList = shoppingList.filter((item) =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredShoppingList = shoppingList
+    .filter((item) =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      (selectedCategory === "All" || item.category === selectedCategory)
+    );
 
   return (
     <View style={styles.container}>
@@ -120,6 +136,22 @@ const ShoppingList = () => {
         onChangeText={setSearchQuery}
         style={styles.searchInput}
       />
+      <View style={styles.categoryFilter}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {categories.map((category) => (
+            <Pressable
+              key={category}
+              style={[
+                styles.categoryChip,
+                selectedCategory === category && styles.selectedCategoryChip
+              ]}
+              onPress={() => setSelectedCategory(category)}
+            >
+              <Text style={styles.categoryChipText}>{category}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
       <Button title="Add Item" onPress={() => setModalVisible(true)} color="#444" />
       <Modal
         animationType="slide"
@@ -141,6 +173,22 @@ const ShoppingList = () => {
               onChangeText={setItemQuantity}
               keyboardType="numeric"
               style={styles.input}
+            />
+            <Picker
+              selectedValue={itemCategory}
+              onValueChange={setItemCategory}
+              style={styles.picker}
+            >
+              {categories.filter(cat => cat !== "All").map((category) => (
+                <Picker.Item key={category} label={category} value={category} />
+              ))}
+            </Picker>
+            <TextInput
+              placeholder="Notes (optional)"
+              value={itemNotes}
+              onChangeText={setItemNotes}
+              style={styles.input}
+              multiline
             />
             <View style={styles.buttonContainer}>
               <Button
@@ -276,6 +324,33 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     textAlign: 'center',
+  },
+  categoryFilter: {
+    marginVertical: 10,
+    height: 40,
+  },
+  categoryChip: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    backgroundColor: '#444',
+    borderRadius: 20,
+    marginHorizontal: 5,
+  },
+  selectedCategoryChip: {
+    backgroundColor: '#666',
+  },
+  categoryChipText: {
+    color: '#fff',
+  },
+  picker: {
+    width: '100%',
+    backgroundColor: 'grey',
+    marginBottom: 10,
+  },
+  notesText: {
+    color: '#aaa',
+    fontSize: 12,
+    marginTop: 5,
   },
 });
 
